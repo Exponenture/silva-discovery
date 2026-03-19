@@ -42,12 +42,39 @@ function calcNet(pA, vA, items, itemval, gap, rate, platform, silva, vas, dsplit
   return itemval * gap * (items * pA) * rate + vas * dsplit * (items * vA) * 12 - (platform * 12 + silva * items * 12)
 }
 
+const updateSliderFill = (input, colour) => {
+  const pct = (input.value - input.min) / (input.max - input.min) * 100
+  input.style.background = `linear-gradient(to right, ${colour} ${pct}%, #1A2E4A ${pct}%)`
+}
+
 export default function AdoptionModel() {
   const { values, set, reset } = useModel()
   const chartBreakRef = useRef(null)
   const chartScenRef = useRef(null)
   const chartBreakInst = useRef(null)
   const chartScenInst = useRef(null)
+  const premSliderRef = useRef(null)
+  const vasSliderRef = useRef(null)
+
+  useEffect(() => {
+    const style = document.createElement('style')
+    style.id = 'adopt-slider-styles'
+    if (!document.getElementById('adopt-slider-styles')) {
+      style.textContent = `
+        input[type=range].adopt-slider{-webkit-appearance:none;appearance:none;width:100%;height:3px;outline:none;cursor:pointer;border-radius:0;}
+        input[type=range].adopt-slider::-webkit-slider-runnable-track{height:3px;border-radius:0;}
+        input[type=range].adopt-slider::-webkit-slider-thumb{-webkit-appearance:none;width:14px;height:14px;background:#C9973A;border-radius:50%;cursor:pointer;margin-top:-5px;}
+        input[type=range].adopt-slider::-moz-range-thumb{width:14px;height:14px;background:#C9973A;border-radius:50%;cursor:pointer;border:none;}
+      `
+      document.head.appendChild(style)
+    }
+    return () => document.getElementById('adopt-slider-styles')?.remove()
+  }, [])
+
+  useEffect(() => {
+    if (premSliderRef.current) updateSliderFill(premSliderRef.current, '#C9973A')
+    if (vasSliderRef.current) updateSliderFill(vasSliderRef.current, '#2D7A4F')
+  }, [values.premAdopt, values.vasAdopt])
 
   const calc = useMemo(() => {
     const { items, itemval, gap, platform, silva, vas, dsplit, rate, premAdopt, vasAdopt } = values
@@ -168,22 +195,21 @@ export default function AdoptionModel() {
             </div>
             <div style={{ padding: '12px 14px' }}>
               {[
-                { key: 'premAdopt', name: 'Premium update opt-in', color: C.gold, fillColor: C.gold },
-                { key: 'vasAdopt', name: 'Always On VAS opt-in', color: C.green2, fillColor: C.green2 },
-              ].map(({ key, name, color, fillColor }) => (
+                { key: 'premAdopt', name: 'Premium update opt-in', color: C.gold, sliderRef: premSliderRef, fillColour: '#C9973A' },
+                { key: 'vasAdopt', name: 'Always On VAS opt-in', color: C.green2, sliderRef: vasSliderRef, fillColour: '#2D7A4F' },
+              ].map(({ key, name, color, sliderRef, fillColour }) => (
                 <div key={key} style={{ marginBottom: 10 }}>
                   <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'baseline', marginBottom: 4 }}>
                     <div style={{ fontSize: 10, color: '#fff', fontWeight: 500 }}>{name}</div>
                     <div style={{ fontSize: 14, fontWeight: 300, color }}>{values[key]}%</div>
                   </div>
                   <input
+                    ref={sliderRef}
+                    className="adopt-slider"
                     type="range" min={5} max={100} step={5} value={values[key]}
-                    onChange={e => set(key, parseFloat(e.target.value))}
-                    style={{ width: '100%', height: 3, accentColor: fillColor, cursor: 'pointer', display: 'block', marginBottom: 4 }}
+                    onChange={e => { set(key, parseFloat(e.target.value)); updateSliderFill(e.target, fillColour) }}
+                    style={{ display: 'block', marginBottom: 2 }}
                   />
-                  <div style={{ height: 4, background: C.navy2 }}>
-                    <div style={{ height: 4, width: Math.min(values[key], 100) + '%', background: fillColor, transition: 'width .3s ease' }} />
-                  </div>
                   <div style={{ fontSize: 9, color: C.subtle, marginTop: 1 }}>
                     {key === 'premAdopt' ? N(premItems) + ' items update their premium' : N(vasItems) + ' items on Always On VAS'}
                   </div>
