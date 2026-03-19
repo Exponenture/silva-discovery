@@ -4,7 +4,7 @@
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>SILVA × Discovery — Methodology & Guide</title>
-<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600&display=swap" rel="stylesheet">
 <style>
 *{margin:0;padding:0;box-sizing:border-box;}
 :root{
@@ -14,68 +14,111 @@
   --ink:#0F1D35;--muted:#6B7A8D;--subtle:#A8B4C0;
   --green:#2D7A4F;--green-bg:#E8F5EE;
 }
-body{font-family:'Poppins',system-ui,sans-serif;background:var(--cream);color:var(--ink);font-size:13px;line-height:1.6;}
-.top-bar{background:var(--navy);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--gold);}
-.tb-title{font-size:16px;font-weight:500;color:#fff;letter-spacing:-.01em;}
-.tb-sub{font-size:10px;color:var(--gold2);margin-top:2px;}
-.badge{background:var(--navy2);border:0.5px solid var(--gold2);color:var(--gold2);font-size:9px;padding:3px 9px;letter-spacing:.08em;text-transform:uppercase;}
-.page{max-width:900px;margin:0 auto;padding:40px 28px 60px;}
-.hero{background:var(--navy);padding:32px 36px;margin-bottom:36px;border-left:4px solid var(--gold);}
-.hero-label{font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
-.hero-title{font-size:24px;font-weight:300;color:#fff;line-height:1.2;margin-bottom:12px;}
-.hero-body{font-size:11px;color:#C8D4E0;line-height:1.7;}
+html{scroll-behavior:smooth;}
+body{font-family:'Poppins',system-ui,sans-serif;background:var(--cream);color:var(--ink);font-size:15px;line-height:1.7;}
+
+/* Page header */
+.page-header{background:var(--navy);padding:28px 40px;border-bottom:3px solid var(--gold);}
+.page-header-inner{max-width:860px;margin:0 auto;display:flex;justify-content:space-between;align-items:flex-end;gap:20px;flex-wrap:wrap;}
+.ph-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:8px;}
+.ph-title{font-size:26px;font-weight:300;color:#fff;line-height:1.2;}
+.ph-sub{font-size:13px;color:var(--gold2);margin-top:6px;line-height:1.5;}
+.badge{background:var(--navy2);border:0.5px solid var(--gold2);color:var(--gold2);font-size:10px;padding:4px 12px;letter-spacing:.08em;text-transform:uppercase;white-space:nowrap;}
+.badges{display:flex;gap:8px;flex-wrap:wrap;}
+
+/* Main content */
+.page{max-width:860px;margin:0 auto;padding:48px 40px 80px;}
+
+/* Section label */
+.section-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);font-weight:500;padding-bottom:10px;border-bottom:1px solid var(--gold2);margin-bottom:28px;margin-top:56px;}
+.section-label:first-child{margin-top:0;}
+
+/* Hero */
+.hero{background:var(--navy);padding:36px 40px;margin-bottom:48px;border-left:4px solid var(--gold);border-radius:0;}
+.hero-label{font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.hero-title{font-size:26px;font-weight:300;color:#fff;line-height:1.25;margin-bottom:16px;}
+.hero-body{font-size:14px;color:#C8D4E0;line-height:1.8;}
 .hero-body strong{color:#fff;font-weight:500;}
-.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
-.how-card{background:#fff;border:0.5px solid var(--border);padding:18px;}
-.how-num{font-size:28px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:8px;}
-.how-title{font-size:11px;font-weight:500;color:var(--navy);margin-bottom:6px;}
-.how-body{font-size:10px;color:var(--muted);line-height:1.6;}
-.section-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:500;padding-bottom:8px;border-bottom:0.5px solid var(--gold2);margin-bottom:20px;}
-.slider-group{margin-bottom:32px;}
-.slider-group-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:14px;padding-left:12px;border-left:3px solid var(--gold);}
-.slider-row{display:grid;grid-template-columns:220px 1fr;gap:0;border:0.5px solid var(--border);margin-bottom:8px;background:#fff;}
-.slider-left{background:var(--navy);padding:14px 16px;display:flex;flex-direction:column;justify-content:center;}
-.slider-name{font-size:11px;font-weight:500;color:#fff;margin-bottom:2px;}
-.slider-default{font-size:9px;color:var(--gold2);}
-.slider-right{padding:14px 18px;}
-.slider-what{font-size:10.5px;color:var(--ink);margin-bottom:5px;line-height:1.5;}
-.slider-why{font-size:9.5px;color:var(--muted);line-height:1.55;}
+
+/* How-to cards */
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:16px;margin-bottom:0;}
+.how-card{background:#fff;border:0.5px solid var(--border);padding:24px 22px;}
+.how-num{font-size:32px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:12px;}
+.how-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:8px;}
+.how-body{font-size:13px;color:var(--muted);line-height:1.7;}
+
+/* Slider reference rows */
+.slider-group{margin-bottom:36px;}
+.slider-group-title{font-size:15px;font-weight:500;color:var(--navy);margin-bottom:16px;padding-left:14px;border-left:3px solid var(--gold);}
+.slider-row{display:grid;grid-template-columns:200px 1fr;gap:0;border:0.5px solid var(--border);margin-bottom:10px;background:#fff;}
+.slider-left{background:var(--navy);padding:18px 20px;display:flex;flex-direction:column;justify-content:center;}
+.slider-name{font-size:13px;font-weight:500;color:#fff;margin-bottom:4px;line-height:1.4;}
+.slider-default{font-size:11px;color:var(--gold2);}
+.slider-right{padding:18px 22px;}
+.slider-what{font-size:13px;color:var(--ink);margin-bottom:8px;line-height:1.6;}
+.slider-why{font-size:12px;color:var(--muted);line-height:1.65;}
 .slider-why em{color:var(--gold);font-style:normal;}
-.formula-block{background:var(--navy3);border:0.5px solid var(--navy2);border-left:3px solid var(--gold);padding:18px 20px;margin-bottom:12px;}
-.formula-label{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
-.formula-eq{font-size:13px;font-weight:500;color:#fff;font-family:'Courier New',monospace;margin-bottom:8px;line-height:1.6;}
-.formula-plain{font-size:10px;color:var(--subtle);line-height:1.6;}
-.formula-example{margin-top:10px;padding-top:10px;border-top:0.5px solid #2A3F5C;font-size:10px;color:#6BCF95;}
-.assumption-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
-.assumption-card{background:#fff;border:0.5px solid var(--border);padding:14px 16px;}
-.assumption-title{font-size:10px;font-weight:500;color:var(--navy);margin-bottom:5px;}
-.assumption-body{font-size:9.5px;color:var(--muted);line-height:1.6;}
-.assumption-flag{display:inline-block;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;margin-top:6px;}
+
+/* Formula blocks */
+.formula-block{background:var(--navy3);border:0.5px solid var(--navy2);border-left:3px solid var(--gold);padding:22px 24px;margin-bottom:14px;}
+.formula-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:12px;}
+.formula-eq{font-size:14px;font-weight:500;color:#fff;font-family:'Courier New',monospace;margin-bottom:10px;line-height:1.7;word-break:break-word;}
+.formula-plain{font-size:13px;color:var(--subtle);line-height:1.7;}
+.formula-example{margin-top:14px;padding-top:14px;border-top:0.5px solid #2A3F5C;font-size:12px;color:#6BCF95;line-height:1.7;}
+
+/* Assumption cards */
+.assumption-grid{display:grid;grid-template-columns:1fr 1fr;gap:14px;margin-bottom:36px;}
+.assumption-card{background:#fff;border:0.5px solid var(--border);padding:18px 20px;}
+.assumption-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:8px;}
+.assumption-body{font-size:12px;color:var(--muted);line-height:1.7;}
+.assumption-flag{display:inline-block;font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;margin-top:10px;border-radius:2px;}
 .flag-conservative{background:var(--green-bg);color:var(--green);}
 .flag-neutral{background:var(--gold3);color:#8A5A10;}
-.caution-box{background:var(--gold3);border:0.5px solid var(--gold2);border-left:3px solid var(--gold);padding:16px 18px;margin-bottom:32px;}
-.caution-label{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#8A5A10;margin-bottom:8px;}
-.caution-body{font-size:10.5px;color:#5A3A0A;line-height:1.65;}
+
+/* Caution */
+.caution-box{background:var(--gold3);border:0.5px solid var(--gold2);border-left:3px solid var(--gold);padding:20px 24px;margin-bottom:36px;}
+.caution-label{font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:#8A5A10;margin-bottom:10px;}
+.caution-body{font-size:13px;color:#5A3A0A;line-height:1.75;}
+
+/* Bottom rule */
 .bottom-rule{height:3px;background:var(--gold);}
+
+/* Responsive */
+@media(max-width:700px){
+  .page-header{padding:20px 20px;}
+  .page{padding:32px 20px 60px;}
+  .how-grid{grid-template-columns:1fr;}
+  .slider-row{grid-template-columns:1fr;}
+  .assumption-grid{grid-template-columns:1fr;}
+  .formula-eq{font-size:12px;}
+  .hero{padding:24px 22px;}
+  .hero-title{font-size:20px;}
+}
+@media(max-width:480px){
+  .ph-title{font-size:20px;}
+}
 </style>
 </head>
 <body>
 
-<div class="top-bar">
-  <div>
-    <div class="tb-title">SILVA × Discovery — Methodology & Guide</div>
-    <div class="tb-sub">How the models work, what each slider controls, and the assumptions behind the numbers.</div>
-  </div>
-  <div style="display:flex;gap:6px;">
-    <div class="badge">Confidential</div>
-    <div class="badge">March 2026</div>
+<div class="page-header">
+  <div class="page-header-inner">
+    <div>
+      <div class="ph-label">About this tool</div>
+      <div class="ph-title">Methodology & Guide</div>
+      <div class="ph-sub">How the models work, what each slider controls, and the assumptions behind the numbers.</div>
+    </div>
+    <div class="badges">
+      <div class="badge">Confidential</div>
+      <div class="badge">March 2026</div>
+    </div>
   </div>
 </div>
 
 <div class="page">
 
   <div class="hero">
-    <div class="hero-label">About this tool</div>
+    <div class="hero-label">Our approach</div>
     <div class="hero-title">A transparent model, not a sales pitch</div>
     <div class="hero-body">This tool is designed to let Discovery's team stress-test the SILVA commercial proposition using your own assumptions. Every input is adjustable. Every formula is documented here. The default values are based on <strong>industry benchmarks and publicly available South African jewellery insurance data</strong> — not optimistic projections. We encourage you to replace any default with a number you trust more. The model should be more compelling with your numbers, not ours.</div>
   </div>
