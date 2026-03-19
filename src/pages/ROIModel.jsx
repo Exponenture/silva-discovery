@@ -1,4 +1,5 @@
-import React, { useEffect, useRef, useMemo } from 'react'
+import React, { useEffect, useRef, useMemo, useState } from 'react'
+import ReactDOM from 'react-dom'
 import Chart from 'chart.js/auto'
 import { useModel, defaults } from '../context/ModelContext'
 
@@ -19,12 +20,52 @@ const fmtM = n => {
   return s + 'R' + Math.round(abs)
 }
 
-function Slider({ label, valueKey, min, max, step, display }) {
+function TipIcon({ tip, formula }) {
+  const [show, setShow] = useState(false)
+  const [pos, setPos] = useState({ top: 0, left: 0 })
+  const iconRef = useRef(null)
+
+  const handleMouseEnter = () => {
+    if (iconRef.current) {
+      const r = iconRef.current.getBoundingClientRect()
+      setPos({ top: r.top + r.height / 2, left: r.right + 8 })
+    }
+    setShow(true)
+  }
+
+  return (
+    <span
+      ref={iconRef}
+      style={{ display: 'inline-flex', alignItems: 'center', marginLeft: 4, fontSize: 10, color: C.gold2, cursor: 'default', flexShrink: 0 }}
+      onMouseEnter={handleMouseEnter}
+      onMouseLeave={() => setShow(false)}
+    >
+      ⓘ
+      {show && ReactDOM.createPortal(
+        <span style={{
+          position: 'fixed', top: pos.top, left: pos.left, transform: 'translateY(-50%)',
+          width: 300, background: C.navy, border: `0.5px solid ${C.gold2}`, borderLeft: `3px solid ${C.gold}`,
+          padding: '14px 16px', fontSize: 12, color: '#C8D4E0', lineHeight: 1.65,
+          zIndex: 9999, pointerEvents: 'none', whiteSpace: 'normal', fontWeight: 400,
+        }}>
+          {tip}
+          {formula && <span style={{ display: 'block', marginTop: 8, fontFamily: "'Courier New', monospace", fontSize: 11, color: C.gold }}>{formula}</span>}
+        </span>,
+        document.body
+      )}
+    </span>
+  )
+}
+
+function Slider({ label, valueKey, min, max, step, display, tip, formula }) {
   const { values, set } = useModel()
   const v = values[valueKey]
   return (
     <div style={{ marginBottom: 12 }}>
-      <div style={{ fontSize: 10, color: C.subtle, marginBottom: 4 }}>{label}</div>
+      <div style={{ fontSize: 10, color: C.subtle, marginBottom: 4, display: 'flex', alignItems: 'center' }}>
+        <span>{label}</span>
+        {tip && <TipIcon tip={tip} formula={formula} />}
+      </div>
       <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
         <input
           type="range" min={min} max={max} step={step} value={v}
@@ -125,25 +166,25 @@ export default function ROIModel() {
 
           <div style={{ marginBottom: 20 }}>
             {sbLabel('Portfolio')}
-            <Slider label="Total items in book" valueKey="items" min={10000} max={300000} step={1000} display={v => Math.round(v).toLocaleString('en-ZA')} />
-            <Slider label="Avg premium per item / mo (R)" valueKey="premium" min={50} max={500} step={5} display={v => 'R' + v} />
-            <Slider label="Avg declared item value (R)" valueKey="itemval" min={1000} max={30000} step={500} display={v => 'R' + parseInt(v).toLocaleString('en-ZA')} />
-            <Slider label="Underinsurance gap" valueKey="gap" min={10} max={70} step={5} display={v => v + '%'} />
+            <Slider label="Total items in book" valueKey="items" min={10000} max={300000} step={1000} display={v => Math.round(v).toLocaleString('en-ZA')} tip="Total individual jewellery items across all policies." formula="Used as base for all calculations" />
+            <Slider label="Avg premium per item / mo (R)" valueKey="premium" min={50} max={500} step={5} display={v => 'R' + v} tip="What Discovery earns per item per month." formula="Reference only — not in ROI formula" />
+            <Slider label="Avg declared item value (R)" valueKey="itemval" min={1000} max={30000} step={500} display={v => 'R' + parseInt(v).toLocaleString('en-ZA')} tip="What items are currently insured for — the declared value, not replacement cost." formula="Gap = declared value × underinsurance %" />
+            <Slider label="Underinsurance gap" valueKey="gap" min={10} max={70} step={5} display={v => v + '%'} tip="How far below true replacement cost items are currently declared." formula="Uplift value = declared value × gap %" />
           </div>
 
           <div style={{ marginBottom: 20 }}>
             {sbLabel('SILVA Fees')}
-            <Slider label="Platform fee / mo (R)" valueKey="platform" min={20000} max={100000} step={5000} display={v => 'R' + parseInt(v).toLocaleString('en-ZA')} />
-            <Slider label="Digitisation fee / item (R)" valueKey="dig" min={15} max={50} step={1} display={v => 'R' + v} />
-            <Slider label="SILVA revaluation share / item / mo (R)" valueKey="silva" min={1} max={8} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} />
-            <Slider label="Items digitised / month" valueKey="monthly" min={1000} max={30000} step={1000} display={v => parseInt(v).toLocaleString('en-ZA')} />
+            <Slider label="Platform fee / mo (R)" valueKey="platform" min={20000} max={100000} step={5000} display={v => 'R' + parseInt(v).toLocaleString('en-ZA')} tip="Fixed monthly SaaS fee Discovery pays SILVA regardless of item count." formula="Annual = platform × 12" />
+            <Slider label="Digitisation fee / item (R)" valueKey="dig" min={15} max={50} step={1} display={v => 'R' + v} tip="Once-off OCR processing fee per item — charged in year one only." formula="Year 1 dig cost = fee × items" />
+            <Slider label="SILVA revaluation share / item / mo (R)" valueKey="silva" min={1} max={8} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="SILVA's monthly revaluation fee, charged on the full digitised book." formula="Annual reval = silva × items × 12" />
+            <Slider label="Items digitised / month" valueKey="monthly" min={1000} max={30000} step={1000} display={v => parseInt(v).toLocaleString('en-ZA')} tip="Monthly rate at which SILVA onboards items into the platform." formula="Controls the 24-month cost ramp-up curve" />
           </div>
 
           <div style={{ marginBottom: 20 }}>
             {sbLabel('VAS Pass-through')}
-            <Slider label="Gross VAS fee Discovery charges (R)" valueKey="vas" min={3} max={15} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} />
-            <Slider label="Discovery's share of VAS" valueKey="dsplit" min={50} max={80} step={5} display={v => v + '%'} />
-            <Slider label="Insurance rate (premium / value)" valueKey="rate" min={1} max={5} step={0.1} display={v => parseFloat(v).toFixed(1) + '%'} />
+            <Slider label="Gross VAS fee Discovery charges (R)" valueKey="vas" min={3} max={15} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="What Discovery charges the customer for Always On Valuations." formula="Discovery keeps split %, SILVA gets remainder" />
+            <Slider label="Discovery's share of VAS" valueKey="dsplit" min={50} max={80} step={5} display={v => v + '%'} tip="Discovery's cut of the gross VAS fee charged to policyholders." formula="VAS revenue = gross × split % × opted-in items × 12" />
+            <Slider label="Insurance rate (premium / value)" valueKey="rate" min={1} max={5} step={0.1} display={v => parseFloat(v).toFixed(1) + '%'} tip="Annual premium as a percentage of insured value." formula="Premium uplift = uplift value × rate" />
           </div>
 
           <button
