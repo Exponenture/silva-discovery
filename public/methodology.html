@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SILVA × Discovery — Methodology & Guide</title>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box;}
+:root{
+  --navy:#0F1D35;--navy2:#1A2E4A;--navy3:#162440;
+  --gold:#C9973A;--gold2:#C9B98A;--gold3:#F0E6CC;
+  --cream:#FAFAF6;--border:#D8D0BA;
+  --ink:#0F1D35;--muted:#6B7A8D;--subtle:#A8B4C0;
+  --green:#2D7A4F;--green-bg:#E8F5EE;
+}
+body{font-family:'Poppins',system-ui,sans-serif;background:var(--cream);color:var(--ink);font-size:13px;line-height:1.6;}
+.top-bar{background:var(--navy);padding:14px 28px;display:flex;justify-content:space-between;align-items:center;border-bottom:3px solid var(--gold);}
+.tb-title{font-size:16px;font-weight:500;color:#fff;letter-spacing:-.01em;}
+.tb-sub{font-size:10px;color:var(--gold2);margin-top:2px;}
+.badge{background:var(--navy2);border:0.5px solid var(--gold2);color:var(--gold2);font-size:9px;padding:3px 9px;letter-spacing:.08em;text-transform:uppercase;}
+.page{max-width:900px;margin:0 auto;padding:40px 28px 60px;}
+.hero{background:var(--navy);padding:32px 36px;margin-bottom:36px;border-left:4px solid var(--gold);}
+.hero-label{font-size:8.5px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.hero-title{font-size:24px;font-weight:300;color:#fff;line-height:1.2;margin-bottom:12px;}
+.hero-body{font-size:11px;color:#C8D4E0;line-height:1.7;}
+.hero-body strong{color:#fff;font-weight:500;}
+.how-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;margin-bottom:36px;}
+.how-card{background:#fff;border:0.5px solid var(--border);padding:18px;}
+.how-num{font-size:28px;font-weight:300;color:var(--gold);line-height:1;margin-bottom:8px;}
+.how-title{font-size:11px;font-weight:500;color:var(--navy);margin-bottom:6px;}
+.how-body{font-size:10px;color:var(--muted);line-height:1.6;}
+.section-label{font-size:8px;letter-spacing:.24em;text-transform:uppercase;color:var(--gold);font-weight:500;padding-bottom:8px;border-bottom:0.5px solid var(--gold2);margin-bottom:20px;}
+.slider-group{margin-bottom:32px;}
+.slider-group-title{font-size:13px;font-weight:500;color:var(--navy);margin-bottom:14px;padding-left:12px;border-left:3px solid var(--gold);}
+.slider-row{display:grid;grid-template-columns:220px 1fr;gap:0;border:0.5px solid var(--border);margin-bottom:8px;background:#fff;}
+.slider-left{background:var(--navy);padding:14px 16px;display:flex;flex-direction:column;justify-content:center;}
+.slider-name{font-size:11px;font-weight:500;color:#fff;margin-bottom:2px;}
+.slider-default{font-size:9px;color:var(--gold2);}
+.slider-right{padding:14px 18px;}
+.slider-what{font-size:10.5px;color:var(--ink);margin-bottom:5px;line-height:1.5;}
+.slider-why{font-size:9.5px;color:var(--muted);line-height:1.55;}
+.slider-why em{color:var(--gold);font-style:normal;}
+.formula-block{background:var(--navy3);border:0.5px solid var(--navy2);border-left:3px solid var(--gold);padding:18px 20px;margin-bottom:12px;}
+.formula-label{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:var(--gold);margin-bottom:10px;}
+.formula-eq{font-size:13px;font-weight:500;color:#fff;font-family:'Courier New',monospace;margin-bottom:8px;line-height:1.6;}
+.formula-plain{font-size:10px;color:var(--subtle);line-height:1.6;}
+.formula-example{margin-top:10px;padding-top:10px;border-top:0.5px solid #2A3F5C;font-size:10px;color:#6BCF95;}
+.assumption-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:32px;}
+.assumption-card{background:#fff;border:0.5px solid var(--border);padding:14px 16px;}
+.assumption-title{font-size:10px;font-weight:500;color:var(--navy);margin-bottom:5px;}
+.assumption-body{font-size:9.5px;color:var(--muted);line-height:1.6;}
+.assumption-flag{display:inline-block;font-size:8px;letter-spacing:.1em;text-transform:uppercase;padding:2px 7px;margin-top:6px;}
+.flag-conservative{background:var(--green-bg);color:var(--green);}
+.flag-neutral{background:var(--gold3);color:#8A5A10;}
+.caution-box{background:var(--gold3);border:0.5px solid var(--gold2);border-left:3px solid var(--gold);padding:16px 18px;margin-bottom:32px;}
+.caution-label{font-size:8px;letter-spacing:.18em;text-transform:uppercase;color:#8A5A10;margin-bottom:8px;}
+.caution-body{font-size:10.5px;color:#5A3A0A;line-height:1.65;}
+.bottom-rule{height:3px;background:var(--gold);}
+</style>
+</head>
+<body>
+
+<div class="top-bar">
+  <div>
+    <div class="tb-title">SILVA × Discovery — Methodology & Guide</div>
+    <div class="tb-sub">How the models work, what each slider controls, and the assumptions behind the numbers.</div>
+  </div>
+  <div style="display:flex;gap:6px;">
+    <div class="badge">Confidential</div>
+    <div class="badge">March 2026</div>
+  </div>
+</div>
+
+<div class="page">
+
+  <div class="hero">
+    <div class="hero-label">About this tool</div>
+    <div class="hero-title">A transparent model, not a sales pitch</div>
+    <div class="hero-body">This tool is designed to let Discovery's team stress-test the SILVA commercial proposition using your own assumptions. Every input is adjustable. Every formula is documented here. The default values are based on <strong>industry benchmarks and publicly available South African jewellery insurance data</strong> — not optimistic projections. We encourage you to replace any default with a number you trust more. The model should be more compelling with your numbers, not ours.</div>
+  </div>
+
+  <div class="section-label">How to use this tool</div>
+  <div class="how-grid">
+    <div class="how-card">
+      <div class="how-num">01</div>
+      <div class="how-title">Start with the ROI Model</div>
+      <div class="how-body">This assumes 100% of your book is digitised and all policyholders update their cover. It shows the theoretical maximum opportunity — the ceiling, not the forecast.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">02</div>
+      <div class="how-title">Then use the Adoption Model</div>
+      <div class="how-body">Apply realistic opt-in rates for premium updates and VAS sign-ups. This is the more honest view. Start conservative — 10%/10% — and see where break-even sits.</div>
+    </div>
+    <div class="how-card">
+      <div class="how-num">03</div>
+      <div class="how-title">Replace our defaults with yours</div>
+      <div class="how-body">If Discovery has better data on average item values, insurance rates, or expected adoption — use it. The model is only as good as the inputs. Ours are starting points.</div>
+    </div>
+  </div>
+
+  <div class="section-label">Portfolio assumptions — what each slider controls</div>
+  <div class="slider-group">
+    <div class="slider-group-title">Portfolio inputs</div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Total items in book</div><div class="slider-default">Default: 160,000</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The total number of individual jewellery items covered across Discovery's portable possessions policies.</div>
+        <div class="slider-why">Default assumes approximately 2.5 items per policy across ~60,000 policies — <em>not confirmed by Discovery</em>. Replace with your actual item count. This is the single most impactful input in the model.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Avg premium per item / mo</div><div class="slider-default">Default: R100</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The average monthly premium Discovery earns per individual item in the portable possessions book.</div>
+        <div class="slider-why">Provided by Discovery in the initial commercial discussion. Used as a sanity check — total premium book = items × R100 × 12. Not used in the ROI calculation directly.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Avg declared item value</div><div class="slider-default">Default: R20,000</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The average value at which items are currently declared on policies — i.e., the insured value, not the replacement cost.</div>
+        <div class="slider-why">R20,000 reflects a specified jewellery book. Industry data suggests declared values are often 40–60% below true replacement cost. This is the most assumption-sensitive input for premium uplift — <em>test both lower and higher values</em>.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Underinsurance gap</div><div class="slider-default">Default: 50%</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The percentage by which the average item is underinsured — i.e., how far below replacement cost the declared value sits.</div>
+        <div class="slider-why">50% is the widely cited industry benchmark for jewellery underinsurance in South Africa. A R20,000 declared item has a true replacement cost of ~R30,000, representing R10,000 of uncorrected value. <em>This is a conservative estimate</em> — some studies show gaps exceeding 60%.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Insurance rate</div><div class="slider-default">Default: 2.0%</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The annual premium rate applied to insured value — what Discovery charges as a percentage of the declared value.</div>
+        <div class="slider-why">2% is a standard benchmark for jewellery in South Africa. Premium uplift is calculated by applying this rate to the corrected value gap. Replace with Discovery's actual blended rate for this book.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-group-title">SILVA fee inputs</div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Platform fee / mo</div><div class="slider-default">Default: R45,000</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The fixed monthly SaaS fee Discovery pays SILVA regardless of item count or activity. Covers infrastructure, API access, account management, and monthly portfolio reports.</div>
+        <div class="slider-why">This is SILVA's proposed rate. It does not scale with volume. Annual cost: R540,000.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Digitisation fee / item</div><div class="slider-default">Default: R30</div></div>
+      <div class="slider-right">
+        <div class="slider-what">A once-off fee per certificate when an item is first ingested into SILVA. Covers AI OCR processing, component decomposition, and template build.</div>
+        <div class="slider-why">Charged once only — never again for the same item. Default of R30 reflects a blended mid-tier rate. The full existing book of 160,000 items at R30 = <em>R4.8M one-off cost in year one</em>.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">SILVA share / item / mo</div><div class="slider-default">Default: R3.00</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The monthly revaluation fee SILVA receives per active item — regardless of whether the customer has opted into the VAS product.</div>
+        <div class="slider-why">Applied to the entire digitised book. At R3 across 160,000 items: <em>R480,000/month, R5.76M/year</em>. This is the number the VAS pass-through is designed to offset.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Gross VAS fee</div><div class="slider-default">Default: R7.50</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The total fee Discovery charges the policyholder for the "Always On Valuations" VAS product — what appears on the customer's policy schedule.</div>
+        <div class="slider-why">Discovery sets this price. SILVA receives 40% (R3.00); Discovery retains 60% (R4.50). Discovery can price this higher — at R10, Discovery keeps R6 and SILVA keeps R4.</div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Discovery VAS share</div><div class="slider-default">Default: 60%</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The percentage of the gross VAS fee that Discovery retains. SILVA receives the remainder (40% at default).</div>
+        <div class="slider-why">60/40 in Discovery's favour is consistent with standard SA insurer VAS partner economics. SILVA's 40% share at R7.50 gross = R3.00 — exactly covering the revaluation fee at defaults.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slider-group">
+    <div class="slider-group-title">Adoption rate inputs (Adoption Model only)</div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Premium update opt-in</div><div class="slider-default">Default: 30%</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The percentage of policyholders who, once SILVA revalues their item, agree to update their declared value and pay the corrected premium.</div>
+        <div class="slider-why">30% is a reasonable mid-point assumption. Premium uplift is only realised on opted-in items. <em>Break-even sits at approximately 13% at R20,000 item value.</em></div>
+      </div>
+    </div>
+
+    <div class="slider-row">
+      <div class="slider-left"><div class="slider-name">Always On VAS opt-in</div><div class="slider-default">Default: 25%</div></div>
+      <div class="slider-right">
+        <div class="slider-what">The percentage of policyholders who opt into the "Always On Valuations" VAS product — the named feature on their policy schedule.</div>
+        <div class="slider-why">VAS revenue to Discovery only comes from opted-in customers. 25% is conservative. SILVA's revaluation fee is charged on the full book regardless of VAS opt-in — the VAS is a revenue recovery mechanism, not a cost trigger.</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="section-label">The formulas — exactly how the numbers are calculated</div>
+
+  <div class="formula-block">
+    <div class="formula-label">Premium uplift (annual)</div>
+    <div class="formula-eq">Uplift = Declared value × Gap % × Opted-in items × Insurance rate</div>
+    <div class="formula-plain">The additional annual premium Discovery earns by correcting underinsured items. Applies the insurance rate to the value gap — the difference between declared value and true replacement cost.</div>
+    <div class="formula-example">At defaults (ROI model): R20,000 × 50% × 160,000 × 2% = R32,000,000/yr<br>At defaults (Adoption model, 30% opt-in): R20,000 × 50% × 48,000 × 2% = R9,600,000/yr</div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">SILVA annual cost to Discovery</div>
+    <div class="formula-eq">Cost = (Platform fee × 12) + (SILVA share × Total items × 12)</div>
+    <div class="formula-plain">The total Discovery pays SILVA per year in steady state (excluding year-one digitisation). The revaluation fee is charged on the full book — not just opted-in items — because SILVA keeps all items current regardless of VAS status.</div>
+    <div class="formula-example">At defaults: (R45,000 × 12) + (R3 × 160,000 × 12) = R540,000 + R5,760,000 = R6,300,000/yr</div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">VAS revenue to Discovery (annual)</div>
+    <div class="formula-eq">VAS revenue = Gross fee × Discovery split % × VAS opted-in items × 12</div>
+    <div class="formula-plain">Discovery's annual margin from the Always On VAS product. Only counts items where the customer has opted in. Discovery sets the gross fee; the split determines how much flows to SILVA vs. Discovery.</div>
+    <div class="formula-example">At defaults (25% VAS adoption): R7.50 × 60% × 40,000 × 12 = R2,160,000/yr<br>At defaults (100% VAS adoption): R7.50 × 60% × 160,000 × 12 = R8,640,000/yr</div>
+  </div>
+
+  <div class="formula-block">
+    <div class="formula-label">Net gain (year 2+)</div>
+    <div class="formula-eq">Net = Premium uplift + VAS revenue − Annual SILVA cost</div>
+    <div class="formula-plain">The net annual financial benefit to Discovery after paying SILVA. Year 1 also subtracts the once-off digitisation cost. Year 2 onwards is the recurring steady-state position.</div>
+    <div class="formula-example">At defaults, Adoption model (30%/25%): R9,600,000 + R2,160,000 − R6,300,000 = +R5,460,000/yr</div>
+  </div>
+
+  <div class="section-label">Known assumptions and their direction of bias</div>
+  <div class="assumption-grid">
+    <div class="assumption-card">
+      <div class="assumption-title">Premium uplift is realised at renewal</div>
+      <div class="assumption-body">The model treats premium uplift as annual and immediate. In practice, corrected values flow through at policy renewal — meaning year-one uplift may be partial depending on renewal distribution across the book.</div>
+      <div class="assumption-flag flag-conservative">Conservative bias</div>
+    </div>
+    <div class="assumption-card">
+      <div class="assumption-title">Underinsurance gap is uniform</div>
+      <div class="assumption-body">The 50% gap is applied uniformly across all items. In reality the distribution will be skewed — some items barely underinsured, others severely so. The average may be higher or lower than 50%.</div>
+      <div class="assumption-flag flag-neutral">Neutral — use Discovery data if available</div>
+    </div>
+    <div class="assumption-card">
+      <div class="assumption-title">All opted-in items fully correct their value</div>
+      <div class="assumption-body">When a policyholder opts into premium update, the model assumes they accept the full corrected value. Some may negotiate or partially update. This slightly overstates uplift.</div>
+      <div class="assumption-flag flag-conservative">Slight optimistic bias</div>
+    </div>
+    <div class="assumption-card">
+      <div class="assumption-title">Item count is estimated</div>
+      <div class="assumption-body">160,000 items assumes 2.5 items per policy across 60,000 policies. Discovery has confirmed 60,000 policies — the item count should be replaced with an actual figure when available.</div>
+      <div class="assumption-flag flag-neutral">Replace with confirmed data</div>
+    </div>
+    <div class="assumption-card">
+      <div class="assumption-title">SILVA cost is charged on full book</div>
+      <div class="assumption-body">R3/item/month applies to all digitised items, not just VAS subscribers. This is correct — SILVA keeps all items current continuously. The VAS fee is a separate revenue recovery product.</div>
+      <div class="assumption-flag flag-conservative">Conservative — full cost, partial revenue</div>
+    </div>
+    <div class="assumption-card">
+      <div class="assumption-title">No portfolio growth modelled</div>
+      <div class="assumption-body">The model holds item count constant across years. New policyholders joining Discovery's book are not modelled as incremental revenue. In practice, growth compounds both cost and benefit.</div>
+      <div class="assumption-flag flag-conservative">Conservative bias</div>
+    </div>
+  </div>
+
+  <div class="caution-box">
+    <div class="caution-label">Important note</div>
+    <div class="caution-body">This model is an indicative commercial planning tool. It is not an actuarial projection and has not been independently verified. All figures are illustrative and dependent on assumptions that will vary from Discovery's actual book composition. SILVA invites Discovery's actuarial team to validate and refine these inputs using portfolio data. The model is designed to be replaced — not relied upon as presented.</div>
+  </div>
+
+</div>
+<div class="bottom-rule"></div>
+</body>
+</html>

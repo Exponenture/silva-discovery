@@ -1,11 +1,15 @@
 import React from 'react'
 import { NavLink } from 'react-router-dom'
+import { useModel, defaults } from '../context/ModelContext'
 
 const N = '#0F1D35'
 const G = '#C9973A'
 const G2 = '#C9B98A'
 
 export default function Nav({ onLogout }) {
+  const { values } = useModel()
+  const isModified = Object.keys(defaults).some(k => values[k] !== defaults[k])
+
   const linkStyle = ({ isActive }) => ({
     display: 'flex', alignItems: 'center', gap: '6px',
     padding: '6px 16px',
@@ -43,9 +47,28 @@ export default function Nav({ onLogout }) {
         }}>
           Commercial Modelling
         </div>
+        <div style={{
+          marginLeft: '12px', display: 'flex', alignItems: 'center', gap: 5,
+          fontSize: '9px', letterSpacing: '0.14em', textTransform: 'uppercase',
+          color: isModified ? G : '#4A6080',
+          transition: 'color 0.3s'
+        }}>
+          <div style={{
+            width: 6, height: 6, borderRadius: '50%',
+            background: isModified ? G : '#2A3F5C',
+            transition: 'background 0.3s'
+          }} />
+          {isModified ? 'Synced' : 'Defaults'}
+        </div>
       </div>
 
       <div style={{ display: 'flex', alignItems: 'center', height: '100%' }}>
+        <NavLink to="/" end style={linkStyle}>
+          Overview
+        </NavLink>
+        <NavLink to="/fee-structure" style={linkStyle}>
+          Fee Structure
+        </NavLink>
         <NavLink to="/roi-model" style={linkStyle}>
           ROI Model
         </NavLink>
