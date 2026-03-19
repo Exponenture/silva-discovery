@@ -110,7 +110,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;background:var(--gold
     <div class="sb-sec-label">Portfolio</div>
     <div class="field"><div class="fl">Total items in book</div><div class="fr"><input type="range" id="s-items" min="10000" max="300000" step="1000" value="160000"><div class="fv gold" id="d-items">160,000</div></div></div>
     <div class="field"><div class="fl">Avg premium per item / mo (R)</div><div class="fr"><input type="range" id="s-premium" min="50" max="500" step="5" value="100"><div class="fv" id="d-premium">R100</div></div></div>
-    <div class="field"><div class="fl">Avg declared item value (R)</div><div class="fr"><input type="range" id="s-itemval" min="1000" max="30000" step="500" value="5000"><div class="fv" id="d-itemval">R5,000</div></div></div>
+    <div class="field"><div class="fl">Avg declared item value (R)</div><div class="fr"><input type="range" id="s-itemval" min="1000" max="30000" step="500" value="20000"><div class="fv" id="d-itemval">R20,000</div></div></div>
     <div class="field"><div class="fl">Underinsurance gap</div><div class="fr"><input type="range" id="s-gap" min="10" max="70" step="5" value="50"><div class="fv" id="d-gap">50%</div></div></div>
     <div class="field"><div class="fl">Insurance rate (premium / value)</div><div class="fr"><input type="range" id="s-rate" min="1" max="5" step="0.1" value="2"><div class="fv" id="d-rate">2.0%</div></div></div>
   </div>
@@ -211,7 +211,7 @@ input[type=range]::-moz-range-thumb{width:13px;height:13px;background:var(--gold
     const js = `const R=n=>{const a=Math.abs(n),s=n<0?'-':'';if(a>=1e6)return s+'R'+(a/1e6).toFixed(1)+'M';if(a>=1e3)return s+'R'+Math.round(a/1000)+'k';return s+'R'+Math.round(a);};
 const N=n=>Math.round(n).toLocaleString('en-ZA');
 const P=n=>Math.round(n)+'%';
-const D={items:160000,premium:100,itemval:5000,gap:50,rate:2,platform:45000,dig:30,silva:3,vas:7.5,dsplit:60,premAdopt:30,vasAdopt:25};
+const D={items:160000,premium:100,itemval:20000,gap:50,rate:2,platform:45000,dig:30,silva:3,vas:7.5,dsplit:60,premAdopt:30,vasAdopt:25};
 let chartBreak,chartScen;
 function g(id){return parseFloat(document.getElementById(id).value);}
 function calcNet(pA,vA,items,itemval,gap,rate,platform,silva,vas,dsplit){

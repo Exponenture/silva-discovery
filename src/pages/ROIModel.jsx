@@ -110,7 +110,7 @@ input[type=range]::-moz-range-thumb{width:14px;height:14px;background:var(--gold
         <div class="field-label">Avg declared item value (R)</div>
         <div class="field-row">
           <input type="range" id="s-itemval" min="1000" max="30000" step="500" value="20000">
-          <div class="field-val" id="d-itemval">R5,000</div>
+          <div class="field-val" id="d-itemval">R20,000</div>
         </div>
       </div>
       <div class="field">
