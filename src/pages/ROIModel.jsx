@@ -88,18 +88,23 @@ export default function ROIModel() {
   const calc = useMemo(() => {
     const { items, itemval, gap, platform, silva, monthly, vas, dsplit, rate } = values
     const gapF = gap / 100, dsplitF = dsplit / 100, rateF = rate / 100
-    const discShare = vas * dsplitF
-    const silvaCovered = silva <= vas
+    const silvaPctShare = vas * (1 - dsplitF)
+    const silvaPerItem = Math.max(silva, silvaPctShare)
+    const discPerItem = Math.max(0, vas - silvaPerItem)
+    const floorApplies = silvaPctShare < silva
+    const crossover = silva / (1 - dsplitF)
+    const silvaCovered = vas >= silva
     const annualCost = platform * 12 + silva * items * 12
     const premiumUplift = itemval * gapF * items * rateF
-    const annualVasDisc = discShare * items * 12
+    const annualVasDisc = discPerItem * items * 12
+    const annualVasSilva = silvaPerItem * items * 12
     const netRoi = premiumUplift + annualVasDisc - annualCost
     const roi1 = premiumUplift + annualVasDisc - (annualCost + items * values.dig)
     const months = Array.from({ length: 24 }, (_, i) => i + 1)
     const digArr = months.map(m => (Math.min(m * monthly, items) - Math.min((m - 1) * monthly, items)) * values.dig)
     const revalArr = months.map(m => Math.min(m * monthly, items) * silva)
     const platArr = months.map(() => platform)
-    return { discShare, silvaCovered, annualCost, premiumUplift, annualVasDisc, netRoi, roi1, months, digArr, revalArr, platArr }
+    return { silvaPctShare, silvaPerItem, discPerItem, floorApplies, crossover, silvaCovered, annualCost, premiumUplift, annualVasDisc, annualVasSilva, netRoi, roi1, months, digArr, revalArr, platArr }
   }, [values])
 
   useEffect(() => {
@@ -130,7 +135,7 @@ export default function ROIModel() {
     return () => { chartInstance.current?.destroy() }
   }, [values])
 
-  const { annualCost, premiumUplift, annualVasDisc, netRoi, silvaCovered, discShare } = calc
+  const { annualCost, premiumUplift, annualVasDisc, annualVasSilva, netRoi, silvaCovered, silvaPerItem, discPerItem, floorApplies, crossover } = calc
   const maxBar = Math.max(premiumUplift, annualVasDisc, values.platform * 12, values.silva * values.items * 12)
   const bars = [
     { name: 'Premium uplift (annual)', val: premiumUplift },
@@ -176,7 +181,7 @@ export default function ROIModel() {
             {sbLabel('SILVA Fees')}
             <Slider label="Platform fee / mo (R)" valueKey="platform" min={20000} max={100000} step={5000} display={v => 'R' + parseInt(v).toLocaleString('en-ZA')} tip="Fixed monthly SaaS fee Discovery pays SILVA regardless of item count." formula="Annual = platform × 12" />
             <Slider label="Digitisation fee / item (R)" valueKey="dig" min={15} max={50} step={1} display={v => 'R' + v} tip="Once-off OCR processing fee per item — charged in year one only." formula="Year 1 dig cost = fee × items" />
-            <Slider label="SILVA revaluation share / item / mo (R)" valueKey="silva" min={1} max={8} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="SILVA's monthly revaluation fee, charged on the full digitised book." formula="Annual reval = silva × items × 12" />
+            <Slider label="SILVA Always On minimum fee (R)" valueKey="silva" min={1} max={8} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="SILVA's minimum fee per item per month — also acts as the floor for VAS pass-through. If the VAS percentage share falls below this, SILVA still earns this minimum." formula="Annual reval = silva × items × 12" />
             <Slider label="Items digitised / month" valueKey="monthly" min={1000} max={30000} step={1000} display={v => parseInt(v).toLocaleString('en-ZA')} tip="Monthly rate at which SILVA onboards items into the platform." formula="Controls the 24-month cost ramp-up curve" />
           </div>
 
@@ -252,9 +257,9 @@ export default function ROIModel() {
                   null,
                   { val: 'R' + parseFloat(values.vas).toFixed(2), label: 'VAS charged', color: C.ink },
                   null,
-                  { val: 'R' + parseFloat(values.silva).toFixed(2), label: 'SILVA receives', color: C.gold },
+                  { val: 'R' + silvaPerItem.toFixed(2), label: floorApplies ? 'SILVA receives (floor)' : `SILVA receives (${Math.round((1 - values.dsplit / 100) * 100)}%)`, color: C.gold },
                   null,
-                  { val: 'R' + (values.vas * (values.dsplit / 100)).toFixed(2), label: 'Discovery retains', color: C.subtle },
+                  { val: 'R' + discPerItem.toFixed(2), label: 'Discovery retains', color: C.subtle },
                 ].map((n, i) => n === null
                   ? <div key={i} style={{ fontSize: 16, color: C.gold2, textAlign: 'center', padding: '0 2px' }}>›</div>
                   : <div key={i} style={{ textAlign: 'center', padding: '10px 4px' }}>
@@ -266,13 +271,21 @@ export default function ROIModel() {
               <div style={{ marginTop: 14, paddingTop: 12, borderTop: `0.5px solid ${C.border}`, display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 10 }}>
                 <div style={{ background: C.greenBg, padding: '10px 12px' }}>
                   <div style={{ fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', color: C.green, marginBottom: 3 }}>Discovery VAS margin</div>
-                  <div style={{ fontSize: 18, fontWeight: 300, color: C.green }}>R{discShare.toFixed(2)}</div>
-                  <div style={{ fontSize: 10, color: C.muted }}>{values.dsplit}% of gross</div>
+                  <div style={{ fontSize: 18, fontWeight: 300, color: C.green }}>R{discPerItem.toFixed(2)}</div>
+                  <div style={{ fontSize: 10, color: C.muted }}>{floorApplies ? `R${discPerItem.toFixed(2)} after SILVA floor` : `${values.dsplit}% of gross`}</div>
                 </div>
                 <div style={{ background: C.gold3, padding: '10px 12px' }}>
                   <div style={{ fontSize: 9, letterSpacing: '.12em', textTransform: 'uppercase', color: '#8A5A10', marginBottom: 3 }}>SILVA fully covered by VAS</div>
-                  <div style={{ fontSize: 18, fontWeight: 300, color: C.gold }}>{silvaCovered ? 'Yes' : 'Partial'}</div>
-                  <div style={{ fontSize: 10, color: C.muted }}>{silvaCovered ? 'Net cost to Discovery: R0' : `Discovery absorbs R${(values.silva - values.vas).toFixed(2)}/item`}</div>
+                  <div style={{ fontSize: 18, fontWeight: 300, color: C.gold }}>{silvaCovered ? 'Yes' : 'No'}</div>
+                  <div style={{ fontSize: 10, color: C.muted }}>{silvaCovered ? `VAS ≥ floor — Discovery keeps R${discPerItem.toFixed(2)}/item` : `VAS below floor — Discovery keeps R0 from VAS`}</div>
+                </div>
+              </div>
+              <div style={{ marginTop: 10, padding: '8px 10px', background: floorApplies ? '#FFF8EC' : C.greenBg, borderLeft: `3px solid ${floorApplies ? C.gold : C.green}` }}>
+                <div style={{ fontSize: 10, color: floorApplies ? '#8A5A10' : C.green }}>
+                  {floorApplies
+                    ? `Floor active below R${crossover.toFixed(2)}. Raise VAS above R${crossover.toFixed(2)} for SILVA to earn ${Math.round((1 - values.dsplit / 100) * 100)}% of gross instead.`
+                    : `Crossover exceeded (R${crossover.toFixed(2)}). SILVA earns ${Math.round((1 - values.dsplit / 100) * 100)}% of gross — floor not triggered.`
+                  }
                 </div>
               </div>
             </div>
@@ -312,7 +325,7 @@ export default function ROIModel() {
               Discovery spends <strong style={{ color: '#fff' }}>{fmtM(annualCost + values.items * values.dig)}</strong> in year one (including digitisation).{' '}
               Premium correction recovers <strong style={{ color: '#fff' }}>{fmtM(premiumUplift)}</strong> annually.{' '}
               VAS pass-through adds <strong style={{ color: '#fff' }}>{fmtM(annualVasDisc)}</strong> to Discovery per year —{' '}
-              {silvaCovered ? 'covering SILVA\'s revaluation fee entirely.' : 'partially offsetting SILVA\'s fee.'}{' '}
+              {silvaCovered ? 'covering SILVA\'s revaluation fee entirely.' : 'VAS is below the SILVA floor — Discovery earns nothing from VAS pass-through.'}{' '}
               Year-two net gain: <strong style={{ color: '#fff' }}>{fmtM(netRoi)}</strong>.
             </div>
           </div>

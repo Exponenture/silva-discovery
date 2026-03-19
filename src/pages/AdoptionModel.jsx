@@ -80,7 +80,10 @@ function Slider({ label, valueKey, min, max, step, display, tip, formula }) {
 }
 
 function calcNet(pA, vA, items, itemval, gap, rate, platform, silva, vas, dsplit) {
-  return itemval * gap * (items * pA) * rate + vas * dsplit * (items * vA) * 12 - (platform * 12 + silva * items * 12)
+  const silvaPct = vas * (1 - dsplit)
+  const silvaItem = Math.max(silva, silvaPct)
+  const discItem = Math.max(0, vas - silvaItem)
+  return itemval * gap * (items * pA) * rate + discItem * (items * vA) * 12 - (platform * 12 + silva * items * 12)
 }
 
 const updateSliderFill = (input, colour) => {
@@ -123,11 +126,16 @@ export default function AdoptionModel() {
     const premAdoptF = premAdopt / 100, vasAdoptF = vasAdopt / 100
     const premItems = Math.round(items * premAdoptF)
     const vasItems = Math.round(items * vasAdoptF)
+    const silvaPctShare = vas * (1 - dsplitF)
+    const silvaPerItem = Math.max(silva, silvaPctShare)
+    const discPerItem = Math.max(0, vas - silvaPerItem)
+    const floorApplies = silvaPctShare < silva
+    const crossover = silva / (1 - dsplitF)
     const annualCost = platform * 12 + silva * items * 12
     const premUplift = itemval * gapF * premItems * rateF
-    const discVasRev = vas * dsplitF * vasItems * 12
+    const discVasRev = discPerItem * vasItems * 12
     const net = premUplift + discVasRev - annualCost
-    const coveredByVas = silva <= vas
+    const coveredByVas = vas >= silva
 
     const scenarios = [
       { name: 'Conservative', prem: 10, vas: 10 },
@@ -138,7 +146,7 @@ export default function AdoptionModel() {
     ]
     const scNets = scenarios.map(s => calcNet(s.prem / 100, s.vas / 100, items, itemval, gapF, rateF, platform, silva, vas, dsplitF))
 
-    return { premItems, vasItems, annualCost, premUplift, discVasRev, net, coveredByVas, premAdoptF, vasAdoptF, scenarios, scNets }
+    return { premItems, vasItems, annualCost, premUplift, discVasRev, net, coveredByVas, silvaPerItem, discPerItem, floorApplies, crossover, premAdoptF, vasAdoptF, scenarios, scNets }
   }, [values])
 
   useEffect(() => {
@@ -182,7 +190,7 @@ export default function AdoptionModel() {
     return () => { chartBreakInst.current?.destroy(); chartScenInst.current?.destroy() }
   }, [values])
 
-  const { premItems, vasItems, annualCost, premUplift, discVasRev, net, coveredByVas, premAdoptF, vasAdoptF, scenarios, scNets } = calc
+  const { premItems, vasItems, annualCost, premUplift, discVasRev, net, coveredByVas, silvaPerItem, discPerItem, floorApplies, crossover, premAdoptF, vasAdoptF, scenarios, scNets } = calc
   const maxFunnel = values.items
 
   const sbLabel = txt => (
@@ -223,7 +231,7 @@ export default function AdoptionModel() {
             {sbLabel('SILVA Fees')}
             <Slider label="Platform fee / mo (R)" valueKey="platform" min={20000} max={100000} step={5000} display={v => 'R' + parseInt(v).toLocaleString('en-ZA')} tip="Fixed monthly SaaS fee Discovery pays SILVA regardless of item count." formula="Annual = platform × 12" />
             <Slider label="Digitisation fee / item (R)" valueKey="dig" min={15} max={50} step={1} display={v => 'R' + v} tip="Once-off OCR processing fee per item — charged in year one only." formula="Year 1 dig cost = fee × items" />
-            <Slider label="SILVA share / item / mo (R)" valueKey="silva" min={1} max={8} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="SILVA's monthly revaluation fee, charged on the full digitised book." formula="Annual reval = silva × items × 12" />
+            <Slider label="SILVA Always On minimum fee (R)" valueKey="silva" min={1} max={8} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="SILVA's minimum fee per item per month — also acts as the floor for VAS pass-through. If the VAS percentage share falls below this, SILVA still earns this minimum." formula="Annual reval = silva × items × 12" />
             <Slider label="Gross VAS fee charged to customer (R)" valueKey="vas" min={3} max={15} step={0.5} display={v => 'R' + parseFloat(v).toFixed(2)} tip="What Discovery charges the customer for Always On Valuations." formula="Discovery keeps split %, SILVA gets remainder" />
             <Slider label="Discovery VAS share" valueKey="dsplit" min={50} max={80} step={5} display={v => v + '%'} tip="Discovery's cut of the gross VAS fee charged to policyholders." formula="VAS revenue = gross × split % × opted-in items × 12" />
           </div>
@@ -379,7 +387,7 @@ export default function AdoptionModel() {
             <div style={{ fontSize: 10.5, color: '#C8D4E0', lineHeight: 1.65 }}>
               With <strong style={{ color: '#fff' }}>{values.premAdopt}%</strong> of policyholders updating their premium, Discovery recovers <strong style={{ color: '#fff' }}>{R(premUplift)}</strong> in additional premium annually.{' '}
               <strong style={{ color: '#fff' }}>{values.vasAdopt}%</strong> VAS opt-in generates <strong style={{ color: '#fff' }}>{R(discVasRev)}</strong> in Discovery's pocket each year.{' '}
-              {coveredByVas ? <>The VAS fee <strong style={{ color: '#fff' }}>covers SILVA's revaluation cost entirely</strong> — net cost to Discovery is zero on the ongoing fee. </> : 'VAS partially offsets SILVA\'s fee. '}
+              {coveredByVas ? <>The VAS fee <strong style={{ color: '#fff' }}>covers SILVA's minimum entirely</strong> — Discovery retains <strong style={{ color: '#fff' }}>R{discPerItem.toFixed(2)}/item/mo</strong> from VAS pass-through. </> : <>VAS is below the SILVA floor — <strong style={{ color: '#fff' }}>Discovery retains R0</strong> from VAS pass-through. </>}
               After SILVA's full annual cost of <strong style={{ color: '#fff' }}>{R(annualCost)}</strong>, the net position is <strong style={{ color: net >= 0 ? C.green2 : '#FF8080' }}>{R(net)} per year</strong>.
             </div>
           </div>
