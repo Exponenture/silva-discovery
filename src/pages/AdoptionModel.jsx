@@ -79,11 +79,12 @@ function Slider({ label, valueKey, min, max, step, display, tip, formula }) {
   )
 }
 
-function calcNet(pA, vA, items, itemval, gap, rate, platform, silva, vas, dsplit) {
-  const silvaPct = vas * (1 - dsplit)
-  const silvaItem = Math.max(silva, silvaPct)
-  const discItem = Math.max(0, vas - silvaItem)
-  return itemval * gap * (items * pA) * rate + discItem * (items * vA) * 12 - (platform * 12 + silva * items * 12)
+function calcNet(pA, vA, items, itemval, gap, rate, platform, silva, vas, dsplit, dig, yr1) {
+  const recurring = platform * 12 + silva * items * 12
+  const digCost = yr1 ? items * dig : 0
+  const silvaPerItem = Math.max(silva, vas * (1 - dsplit))
+  const discPerItem = Math.max(0, vas - silvaPerItem)
+  return itemval * gap * (items * pA) * rate + discPerItem * (items * vA) * 12 - recurring - digCost
 }
 
 const updateSliderFill = (input, colour) => {
@@ -121,7 +122,7 @@ export default function AdoptionModel() {
   }, [values.premAdopt, values.vasAdopt])
 
   const calc = useMemo(() => {
-    const { items, itemval, gap, platform, silva, vas, dsplit, rate, premAdopt, vasAdopt } = values
+    const { items, itemval, gap, platform, silva, vas, dsplit, rate, premAdopt, vasAdopt, dig } = values
     const gapF = gap / 100, dsplitF = dsplit / 100, rateF = rate / 100
     const premAdoptF = premAdopt / 100, vasAdoptF = vasAdopt / 100
     const premItems = Math.round(items * premAdoptF)
@@ -131,10 +132,13 @@ export default function AdoptionModel() {
     const discPerItem = Math.max(0, vas - silvaPerItem)
     const floorApplies = silvaPctShare < silva
     const crossover = silva / (1 - dsplitF)
-    const annualCost = platform * 12 + silva * items * 12
+    const digCostYr1 = items * dig
+    const annualCostRecurring = platform * 12 + silva * items * 12
+    const annualCostYr1 = annualCostRecurring + digCostYr1
     const premUplift = itemval * gapF * premItems * rateF
     const discVasRev = discPerItem * vasItems * 12
-    const net = premUplift + discVasRev - annualCost
+    const netYr1 = premUplift + discVasRev - annualCostYr1
+    const netYr2 = premUplift + discVasRev - annualCostRecurring
     const coveredByVas = vas >= silva
 
     const scenarios = [
@@ -144,21 +148,21 @@ export default function AdoptionModel() {
       { name: 'Optimistic', prem: 50, vas: 40 },
       { name: 'Full adoption', prem: 100, vas: 80 },
     ]
-    const scNets = scenarios.map(s => calcNet(s.prem / 100, s.vas / 100, items, itemval, gapF, rateF, platform, silva, vas, dsplitF))
+    const scNets = scenarios.map(s => calcNet(s.prem / 100, s.vas / 100, items, itemval, gapF, rateF, platform, silva, vas, dsplitF, dig, false))
 
-    return { premItems, vasItems, annualCost, premUplift, discVasRev, net, coveredByVas, silvaPerItem, discPerItem, floorApplies, crossover, premAdoptF, vasAdoptF, scenarios, scNets }
+    return { premItems, vasItems, annualCostRecurring, annualCostYr1, digCostYr1, premUplift, discVasRev, netYr1, netYr2, coveredByVas, silvaPerItem, discPerItem, floorApplies, crossover, premAdoptF, vasAdoptF, scenarios, scNets }
   }, [values])
 
   useEffect(() => {
     if (!chartBreakRef.current || !chartScenRef.current) return
-    const { annualCost, premUplift, discVasRev, net, scenarios, scNets } = calc
+    const { annualCostRecurring, premUplift, discVasRev, netYr2, scenarios, scNets } = calc
 
     if (chartBreakInst.current) chartBreakInst.current.destroy()
     chartBreakInst.current = new Chart(chartBreakRef.current, {
       type: 'bar',
       data: {
-        labels: ['Premium uplift', 'VAS revenue', 'SILVA cost', 'Net gain'],
-        datasets: [{ data: [premUplift, discVasRev, -annualCost, net], backgroundColor: ['#2D7A4F', '#2D7A4F', '#C9B98A', net >= 0 ? '#2D7A4F' : '#C0392B'] }]
+        labels: ['Premium uplift', 'VAS revenue', 'SILVA cost', 'Net (yr 2+)'],
+        datasets: [{ data: [premUplift, discVasRev, -annualCostRecurring, netYr2], backgroundColor: ['#2D7A4F', '#2D7A4F', '#C9B98A', netYr2 >= 0 ? '#2D7A4F' : '#C0392B'] }]
       },
       options: {
         responsive: true, maintainAspectRatio: false,
@@ -190,7 +194,7 @@ export default function AdoptionModel() {
     return () => { chartBreakInst.current?.destroy(); chartScenInst.current?.destroy() }
   }, [values])
 
-  const { premItems, vasItems, annualCost, premUplift, discVasRev, net, coveredByVas, silvaPerItem, discPerItem, floorApplies, crossover, premAdoptF, vasAdoptF, scenarios, scNets } = calc
+  const { premItems, vasItems, annualCostRecurring, annualCostYr1, digCostYr1, premUplift, discVasRev, netYr1, netYr2, coveredByVas, silvaPerItem, discPerItem, floorApplies, crossover, premAdoptF, vasAdoptF, scenarios, scNets } = calc
   const maxFunnel = values.items
 
   const sbLabel = txt => (
@@ -285,10 +289,10 @@ export default function AdoptionModel() {
           {/* KPI row */}
           <div style={{ display: 'grid', gridTemplateColumns: 'repeat(4,1fr)', gap: 10 }}>
             {[
-              { label: 'SILVA annual cost', val: R(annualCost), color: C.ink, sub: 'Platform + revaluation' },
+              { label: 'Recurring annual cost', val: R(annualCostRecurring), color: C.ink, sub: 'Platform + revaluation' },
               { label: 'Premium uplift / yr', val: R(premUplift), color: C.green, sub: `At ${values.premAdopt}% adoption` },
               { label: 'VAS revenue to Discovery', val: R(discVasRev), color: C.gold, sub: `At ${values.vasAdopt}% VAS adoption` },
-              { label: 'Net gain (year 2+)', val: R(net), color: net >= 0 ? C.green : '#C0392B', sub: 'Uplift + VAS − cost' },
+              { label: 'Net gain (year 2+)', val: R(netYr2), color: netYr2 >= 0 ? C.green : '#C0392B', sub: 'Uplift + VAS − recurring cost' },
             ].map(k => (
               <div key={k.label} style={{ background: '#fff', border: `0.5px solid ${C.border}`, padding: '12px 14px' }}>
                 <div style={{ fontSize: 8.5, letterSpacing: '.14em', textTransform: 'uppercase', color: C.muted, marginBottom: 5 }}>{k.label}</div>
@@ -296,6 +300,15 @@ export default function AdoptionModel() {
                 <div style={{ fontSize: 9.5, color: C.muted, marginTop: 2 }}>{k.sub}</div>
               </div>
             ))}
+          </div>
+
+          {/* Year-1 net banner */}
+          <div style={{ background: netYr1 >= 0 ? C.greenBg : '#FFF0EE', border: `0.5px solid ${netYr1 >= 0 ? C.green : '#C0392B'}`, borderLeft: `3px solid ${netYr1 >= 0 ? C.green : '#C0392B'}`, padding: '10px 16px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <div style={{ fontSize: 8.5, letterSpacing: '.14em', textTransform: 'uppercase', color: netYr1 >= 0 ? C.green : '#C0392B', marginBottom: 3 }}>Net gain — year 1 (incl. digitisation)</div>
+              <div style={{ fontSize: 9.5, color: C.muted }}>Includes once-off digitisation cost of {R(digCostYr1)} — {R(values.dig)}/item × {N(values.items)} items</div>
+            </div>
+            <div style={{ fontSize: 24, fontWeight: 300, color: netYr1 >= 0 ? C.green : '#C0392B', letterSpacing: '-.02em' }}>{netYr1 >= 0 ? '+' : ''}{R(netYr1)}</div>
           </div>
 
           {/* Adoption funnel */}
@@ -339,7 +352,7 @@ export default function AdoptionModel() {
             <div style={{ fontSize: 8.5, letterSpacing: '.18em', textTransform: 'uppercase', color: C.gold, fontWeight: 500, marginBottom: 12, paddingBottom: 7, borderBottom: `0.5px solid ${C.border}` }}>Scenario comparison — what if adoption were different?</div>
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(3,1fr)', gap: 10 }}>
               {[{ name: 'Conservative', prem: 10, vas: 10 }, { name: 'Optimistic', prem: 50, vas: 40 }, { name: 'Full adoption', prem: 100, vas: 80 }].map(s => {
-                const sNet = calcNet(s.prem / 100, s.vas / 100, values.items, values.itemval, values.gap / 100, values.rate / 100, values.platform, values.silva, values.vas, values.dsplit / 100)
+                const sNet = calcNet(s.prem / 100, s.vas / 100, values.items, values.itemval, values.gap / 100, values.rate / 100, values.platform, values.silva, values.vas, values.dsplit / 100, values.dig, false)
                 const isActive = Math.round(premAdoptF * 100) === s.prem && Math.round(vasAdoptF * 100) === s.vas
                 return (
                   <div key={s.name} style={{ border: `0.5px solid ${isActive ? C.gold : C.border}`, background: isActive ? C.gold3 : '#fff', padding: '12px 14px', cursor: 'pointer', transition: 'border-color .2s' }}>
@@ -388,7 +401,8 @@ export default function AdoptionModel() {
               With <strong style={{ color: '#fff' }}>{values.premAdopt}%</strong> of policyholders updating their premium, Discovery recovers <strong style={{ color: '#fff' }}>{R(premUplift)}</strong> in additional premium annually.{' '}
               <strong style={{ color: '#fff' }}>{values.vasAdopt}%</strong> VAS opt-in generates <strong style={{ color: '#fff' }}>{R(discVasRev)}</strong> in Discovery's pocket each year.{' '}
               {coveredByVas ? <>The VAS fee <strong style={{ color: '#fff' }}>covers SILVA's minimum entirely</strong> — Discovery retains <strong style={{ color: '#fff' }}>R{discPerItem.toFixed(2)}/item/mo</strong> from VAS pass-through. </> : <>VAS is below the SILVA floor — <strong style={{ color: '#fff' }}>Discovery retains R0</strong> from VAS pass-through. </>}
-              After SILVA's full annual cost of <strong style={{ color: '#fff' }}>{R(annualCost)}</strong>, the net position is <strong style={{ color: net >= 0 ? C.green2 : '#FF8080' }}>{R(net)} per year</strong>.
+              Against a recurring annual cost of <strong style={{ color: '#fff' }}>{R(annualCostRecurring)}</strong>, the year-2+ net position is <strong style={{ color: netYr2 >= 0 ? C.green2 : '#FF8080' }}>{R(netYr2)} per year</strong>.{' '}
+              Year one is <strong style={{ color: netYr1 >= 0 ? C.green2 : '#FF8080' }}>{R(netYr1)}</strong> once the {R(digCostYr1)} once-off digitisation cost is factored in.
             </div>
           </div>
 

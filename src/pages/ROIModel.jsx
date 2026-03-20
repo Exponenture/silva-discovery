@@ -136,10 +136,12 @@ export default function ROIModel() {
   }, [values])
 
   const { annualCost, premiumUplift, annualVasDisc, annualVasSilva, netRoi, silvaCovered, silvaPerItem, discPerItem, floorApplies, crossover } = calc
-  const maxBar = Math.max(premiumUplift, annualVasDisc, values.platform * 12, values.silva * values.items * 12)
+  const digCostYr1 = values.items * values.dig
+  const maxBar = Math.max(premiumUplift, annualVasDisc, values.platform * 12, values.silva * values.items * 12, digCostYr1)
   const bars = [
     { name: 'Premium uplift (annual)', val: premiumUplift },
     { name: 'VAS revenue — Discovery share', val: annualVasDisc },
+    { name: 'Digitisation cost (year 1 only)', val: -digCostYr1 },
     { name: 'SILVA platform fee (annual)', val: -(values.platform * 12) },
     { name: 'SILVA revaluation fee (annual)', val: -(values.silva * values.items * 12) },
   ]
